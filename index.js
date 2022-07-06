@@ -40,7 +40,8 @@ let p1NameDiv = document.getElementById("p1Name");
 let p2NameDiv = document.getElementById("p2Name");
 let p1HealthDiv = document.getElementById("p1Health");
 let p2HealthDiv = document.getElementById("p2Health");
-
+let p1Name = prompt("Enter Player One Name") || "Player 1";
+let p2Name = prompt("Enter Player Two Name") || "Player 2";
 // ** Check if either players health is  0 and if it is, then update isOver to true **
 const updateGame = (p1, p2, gameState) => {
   // Update the DOM with the names and the latest health of players
@@ -77,7 +78,7 @@ class Player {
     // Subtract the enemy health with the damageAmount
     enemy.health -= damageAmount;
     //  Update the game and DOM with updateGame()
-    updateGame(player, enemy, game.isOver);
+    updateGame(p1, p2, game.isOver);
     //  Return a message of 'player name attacks enemy name for damageAmount'
     return `${player.name} attacks ${enemy.name}`;
   }
@@ -105,6 +106,14 @@ class Game {
   // ** If the game is over and a player has 0 health declare the winner! **
   declareWinner(isOver, p1, p2) {
     // Create a message variable that will hold a message based on the condition
+    let message;
+    if (isOver) {
+      if (p1.health <= 0) message = `${p2.name} WIN'S`;
+      if (p2.health <= 0) message = `${p1.name} WIN'S`;
+    }
+
+    document.getElementById("victory").play();
+    return (resultDiv.innerText = message);
     // If isOver is true AND p1 health is <= 0 then update message variable  to 'p1 WINS!'
     // Else if isOver is true AND p2 health is <= 0 then update message variable  to 'p2 WINS!'
     // Play victory sound
@@ -114,6 +123,12 @@ class Game {
   // ** Reset the players health back to it's original state and isOver to FALSE **
   reset(p1, p2) {
     // set p1 health and p2 health back to 100 and isOver back to false and clear resultDiv.innerText and don't forget to updateGame()
+
+    p1.health = 100;
+    p2.health = 100;
+    game.isOver = false;
+    resultDiv.innerText = "";
+    updateGame(p1, p2, game.isOVer);
   }
 
   // ** Simulates the whole match untill one player runs out of health **
@@ -129,8 +144,8 @@ class Game {
 }
 
 // ** Create 2 players using the player class **
-let player1 = new Player("yub", 100, 10);
-let player2 = new Player("ghi", 95, 10);
+let player1 = new Player(p1Name, 100, 10);
+let player2 = new Player(p2Name, 100, 10);
 // ** Save original Player Data into a variable in order to reset **
 let p1 = player1;
 let p2 = player2;
@@ -152,21 +167,47 @@ let gameState = game;
 // ** Player 1 Controls **
 document.addEventListener("keydown", function (e) {
   // if you press Q AND the enemy health is greater than 0 AND isOver is still false then strike()
+  if (e.key == "q" && p2.health > 0 && game.isOver == false) {
+    p1.strike(p1, p2, p1.attackDmg);
+    document.getElementById("p1attack").play();
+  }
   // After striking then play attack sound
 });
 
 document.addEventListener("keydown", function (e) {
   // if you press a AND the player health is greater than 0 AND isOver is still false then strike()
+  if (
+    e.key == "a" &&
+    p1.health > 0 &&
+    p1.health < 100 &&
+    game.isOver == false
+  ) {
+    p1.heal(p1);
+    document.getElementById("p1heal").play();
+  }
   // After healing then play heal sound
 });
 
 // ** Player 2 Controls **
 document.addEventListener("keydown", function (e) {
   // if you press p AND enemy health is greater than 0 AND isOver is still false then stike()
+  if (e.key == "p" && p2.health > 0 && game.isOver == false) {
+    p2.strike(p2, p1, p2.attackDmg);
+    document.getElementById("p2attack").play();
+  }
   // After striking then play attack sound
 });
 
 document.addEventListener("keydown", function (e) {
   // if you press l AND the player health is greater than 0 AND isOver is still false then heal()
   // After healing then play heal sound
+  if (
+    e.key == "l" &&
+    p2.health > 0 &&
+    p2.health < 100 &&
+    game.isOver == false
+  ) {
+    p2.heal(p2);
+    document.getElementById("p2heal").play();
+  }
 });
